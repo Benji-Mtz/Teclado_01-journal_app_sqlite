@@ -1,17 +1,33 @@
-entries = [
-    {"content": "Today I started learning programing.", "date": "01-01-2020"},
-    {"content": "I created my first SQLite database!", "date": "02-01-2020"},
-    {"content": "I finished writing my programming diary application.", "date": "03-01-2020"},
-    {"content": "Today I'm going to continue learning programming!", "date": "04-01-2020"},
-]
+import sqlite3
 
-def add_entry():
-    entry_content = input("What have you learned today? ")
-    entry_date = input("Enter the date: ")
+entries = []
+
+connection = sqlite3.connect("data.db")
+#  sqlite.Row to get named access to row fields ['date'] en lugar de [1]
+connection.row_factory = sqlite3.Row
+
+def create_table():
+    # with connection do automatically connection.commit()
+    with connection:
+        connection.execute(
+            "CREATE TABLE IF NOT EXISTS entries (content TEXT, date TEXT);")
+
+
+def add_entry(entry_content, entry_date):
+    with connection:
+        connection.execute(
+            "INSERT INTO entries VALUES (?,?);", (entry_content, entry_date)
+        )
+
+
+def get_entries():
+    #cursor = connection.cursor()
+    #cursor.execute("SELECT * FROM entries;")
     
-    entries.append({"content": entry_content, "date": entry_date})
-
-
-def view_entries():
-    for entry in entries:
-        print(f"{entry['date']}\n{entry['content']}\n\n")
+    cursor = connection.execute("SELECT * FROM entries;")
+    #cursor.fetchone() # 1
+    #cursor.fetchone() # 2
+    return cursor
+    
+    
+    
